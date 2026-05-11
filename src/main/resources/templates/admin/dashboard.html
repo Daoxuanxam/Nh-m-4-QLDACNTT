@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Admin</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link th:href="@{/css/admin.css}" rel="stylesheet">
+</head>
+<body>
+<div class="wrapper">
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-icon"><i class="fas fa-book-open"></i></div>
+            <h3>Thư Viện Tri Thức Việt</h3>
+            <small>Quản trị hệ thống</small>
+        </div>
+        <ul class="list-unstyled components">
+            <li class="active"><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+            <li><a th:href="@{/admin/books}"><i class="fas fa-book"></i> <span>Quản lý sách</span></a></li>
+            <li><a th:href="@{/admin/borrows}"><i class="fas fa-clipboard-list"></i> <span>Phiếu mượn</span></a></li>
+            <li><a th:href="@{/admin/readers}"><i class="fas fa-users"></i> <span>Độc giả</span></a></li>
+            <li sec:authorize="hasRole('ADMIN')">
+                <a th:href="@{/admin/staff}"><i class="fas fa-user-tie"></i> <span>Nhân viên</span></a>
+            </li>
+            <li sec:authorize="hasRole('ADMIN')">
+                <a th:href="@{/admin/statistics}"><i class="fas fa-chart-bar"></i> <span>Thống kê</span></a>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <i class="fas fa-user-circle fa-2x"></i>
+                <div>
+                    <strong sec:authentication="name"></strong>
+                    <small sec:authorize="hasRole('ADMIN')">Administrator</small>
+                    <small sec:authorize="hasRole('STAFF')">Nhân viên</small>
+                </div>
+            </div>
+            <form th:action="@{/auth/logout}" method="post" style="margin:0">
+                <button type="submit" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> <span>Đăng xuất</span>
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <div id="content">
+        <nav class="navbar navbar-expand-lg">
+            <button type="button" id="sidebarCollapse" class="btn btn-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <span class="navbar-brand ms-3">Dashboard</span>
+            <div class="ms-auto me-3">
+                <span class="badge bg-warning text-dark" th:if="${pendingBorrows > 0}">
+                    <i class="fas fa-bell"></i>
+                    <span th:text="${pendingBorrows}"></span> yêu cầu chờ duyệt
+                </span>
+            </div>
+        </nav>
+
+        <div class="container-fluid p-4">
+            <div class="row g-4 mb-4">
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card stat-card-blue">
+                        <div class="stat-icon"><i class="fas fa-book"></i></div>
+                        <div class="stat-info">
+                            <h3 th:text="${totalBooks}">0</h3>
+                            <p>Tổng số sách</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card stat-card-green">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-info">
+                            <h3 th:text="${totalReaders}">0</h3>
+                            <p>Độc giả</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card stat-card-orange">
+                        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                        <div class="stat-info">
+                            <h3 th:text="${pendingBorrows}">0</h3>
+                            <p>Chờ duyệt</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="stat-card stat-card-red">
+                        <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="stat-info">
+                            <h3 th:text="${overdueCount}">0</h3>
+                            <p>Quá hạn</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-history me-2"></i>Phiếu mượn gần đây</h5>
+                    <a th:href="@{/admin/borrows}" class="btn btn-sm btn-primary">Xem tất cả</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Độc giả</th>
+                                    <th>Sách</th>
+                                    <th>Ngày mượn</th>
+                                    <th>Hạn trả</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="borrow : ${recentBorrows}">
+                                    <td th:text="${borrow.reader.user.fullName}"></td>
+                                    <td th:text="${borrow.book.title}"></td>
+                                    <td th:text="${borrow.borrowDate}"></td>
+                                    <td th:text="${borrow.dueDate}"></td>
+                                    <td>
+                                        <span th:switch="${borrow.status.name()}">
+                                            <span th:case="'PENDING'" class="badge bg-warning text-dark">Chờ duyệt</span>
+                                            <span th:case="'CONFIRMED'" class="badge bg-info text-dark">Chờ nhận tiền</span>
+                                            <span th:case="'BORROWED'" class="badge bg-primary">Đang mượn</span>
+                                            <span th:case="'RETURNED'" class="badge bg-success">Đã trả</span>
+                                            <span th:case="'OVERDUE'" class="badge bg-danger">Quá hạn</span>
+                                            <span th:case="'REJECTED'" class="badge bg-secondary">Từ chối</span>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(recentBorrows)}">
+                                    <td colspan="5" class="text-center text-muted py-4">
+                                        <i class="fas fa-inbox fa-2x d-block mb-2"></i>Chưa có dữ liệu
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

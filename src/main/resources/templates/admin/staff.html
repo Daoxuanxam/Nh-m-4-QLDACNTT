@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><title>Quản lý nhân viên</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link th:href="@{/css/admin.css}" rel="stylesheet">
+</head>
+<body>
+<div class="wrapper">
+    <nav id="sidebar">
+        <div class="sidebar-header"><div class="brand-icon"><i class="fas fa-book-open"></i></div><h3>Thư Viện Tri Thức Việt</h3></div>
+        <ul class="list-unstyled components">
+            <li><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a th:href="@{/admin/books}"><i class="fas fa-book"></i> Quản lý sách</a></li>
+            <li><a th:href="@{/admin/borrows}"><i class="fas fa-clipboard-list"></i> Phiếu mượn</a></li>
+            <li><a th:href="@{/admin/readers}"><i class="fas fa-users"></i> Độc giả</a></li>
+            <li class="active"><a th:href="@{/admin/staff}"><i class="fas fa-user-tie"></i> Nhân viên</a></li>
+            <li><a th:href="@{/admin/statistics}"><i class="fas fa-chart-bar"></i> Thống kê</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <form th:action="@{/auth/logout}" method="post" style="margin:0">
+                <button type="submit" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                </button>
+            </form>
+        </div>
+    </nav>
+    <div id="content">
+        <nav class="navbar"><button id="sidebarCollapse" class="btn btn-toggle"><i class="fas fa-bars"></i></button>
+            <span class="navbar-brand ms-3">Quản lý nhân viên</span></nav>
+        <div class="container-fluid p-4">
+
+            <!-- Thông báo thành công -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <i class="fas fa-check-circle me-2"></i><span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <!-- Thông báo lỗi -->
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header"><h5 class="mb-0"><i class="fas fa-user-plus me-2"></i>Thêm nhân viên</h5></div>
+                        <div class="card-body">
+                            <form th:action="@{/admin/staff/save}" method="post" th:object="${newStaff}">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Họ tên</label>
+                                    <input type="text" th:field="*{fullName}" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Tên đăng nhập</label>
+                                    <input type="text" th:field="*{username}" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Email</label>
+                                    <input type="email" th:field="*{email}" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Mật khẩu</label>
+                                    <input type="password" th:field="*{password}" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Số điện thoại</label>
+                                    <input type="text" th:field="*{phone}" class="form-control">
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-save me-2"></i>Lưu nhân viên
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-list me-2"></i>Danh sách nhân viên
+                                <span class="badge bg-primary ms-2" th:text="${#lists.size(staffList)}"></span>
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr><th>#</th><th>Họ tên</th><th>Username</th><th>Email</th><th>SĐT</th><th>Ngày tạo</th><th>Thao tác</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="staff, i : ${staffList}">
+                                            <td th:text="${i.count}"></td>
+                                            <td th:text="${staff.fullName}"></td>
+                                            <td><span class="badge bg-secondary" th:text="${staff.username}"></span></td>
+                                            <td th:text="${staff.email}"></td>
+                                            <td th:text="${staff.phone}"></td>
+                                            <td th:text="${staff.createdAt != null ? #temporals.format(staff.createdAt, 'dd/MM/yyyy') : '-'}"></td>
+                                            <td>
+                                                <form th:action="@{/admin/staff/delete/{id}(id=${staff.id})}" method="post"
+                                                      onsubmit="return confirm('Xóa nhân viên này?')" style="display:inline">
+                                                    <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        <tr th:if="${#lists.isEmpty(staffList)}">
+                                            <td colspan="7" class="text-center py-4 text-muted">Chưa có nhân viên nào</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

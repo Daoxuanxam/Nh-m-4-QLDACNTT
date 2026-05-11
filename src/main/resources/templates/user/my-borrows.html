@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"><title>Sách của tôi</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link th:href="@{/css/user.css}" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg user-navbar">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/user/home}"><i class="fas fa-book-open me-2"></i>Thư Viện Tri Thức Việt</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" th:href="@{/user/home}">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/books/list}">Kho sách</a></li>
+                <li class="nav-item"><a class="nav-link active" th:href="@{/user/my-borrows}">Sách của tôi</a></li>
+            </ul>
+            <div class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-1"></i><span sec:authentication="name"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" th:href="@{/user/profile}">Hồ sơ</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/auth/logout}" method="post" style="margin:0">
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container my-5">
+    <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+        <i class="fas fa-check-circle me-2"></i><span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+        <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <h3 class="section-title mb-4"><i class="fas fa-clipboard-list me-2"></i>Lịch sử mượn sách</h3>
+
+    <div th:if="${reader != null}" class="reader-card mb-4">
+        <div class="row align-items-center">
+            <div class="col-auto"><i class="fas fa-id-card fa-3x text-primary"></i></div>
+            <div class="col">
+                <h5 class="mb-1">Thẻ độc giả: <span class="badge bg-primary" th:text="${reader.readerCode}"></span></h5>
+                <small class="text-muted">Tham gia: <span th:text="${reader.memberSince}"></span>
+                    | Hết hạn: <span th:text="${reader.memberExpiry}"></span></small>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th><th>Tên sách</th><th>Tác giả</th>
+                            <th>Ngày đăng ký</th><th>Hạn trả</th>
+                            <th>Gia hạn</th><th>Phí mượn</th>
+                            <th>Trạng thái</th><th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="borrow, i : ${borrows}">
+                            <td th:text="${i.count}"></td>
+                            <td>
+                                <a th:href="@{/books/detail/{id}(id=${borrow.book.id})}"
+                                   th:text="${borrow.book.title}"
+                                   class="text-decoration-none fw-bold"></a>
+                            </td>
+                            <td th:text="${borrow.book.author}"></td>
+                            <td th:text="${borrow.borrowDate}"></td>
+                            <td>
+                                <span th:class="${borrow.dueDate != null
+                                    and borrow.dueDate.isBefore(T(java.time.LocalDate).now())
+                                    and borrow.status.name() == 'BORROWED'} ? 'text-danger fw-bold' : ''"
+                                      th:text="${borrow.dueDate}"></span>
+                            </td>
+                            <td>
+                                <span th:if="${borrow.renewCount > 0}"
+                                      class="badge bg-info text-dark"
+                                      th:text="${borrow.renewCount} + '/2 lần'"></span>
+                                <span th:if="${borrow.renewCount == 0}"
+                                      class="text-muted small">Chưa gia hạn</span>
+                            </td>
+                            <td>
+                                <span th:if="${borrow.borrowFee > 0}" class="text-danger fw-bold"
+                                      th:text="${#numbers.formatDecimal(borrow.borrowFee, 0, 'COMMA', 0, 'POINT') + 'đ'}"></span>
+                                <span th:if="${borrow.borrowFee == 0}" class="text-muted">—</span>
+                            </td>
+                            <td>
+                                <span th:switch="${borrow.status.name()}">
+                                    <span th:case="'PENDING'" class="badge bg-warning text-dark">Chờ duyệt</span>
+                                    <span th:case="'CONFIRMED'" class="badge bg-info text-dark">Chờ nhận tiền</span>
+                                    <span th:case="'BORROWED'" class="badge bg-primary">Đang mượn</span>
+                                    <span th:case="'RETURNED'" class="badge bg-success">Đã trả</span>
+                                    <span th:case="'OVERDUE'" class="badge bg-danger">Quá hạn</span>
+                                    <span th:case="'REJECTED'" class="badge bg-secondary">Từ chối</span>
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1 flex-wrap">
+                                    <!-- Xem phiếu -->
+                                    <a th:if="${borrow.status.name() == 'CONFIRMED' or borrow.status.name() == 'BORROWED'}"
+                                       th:href="@{/user/receipt/{id}(id=${borrow.id})}"
+                                       class="btn btn-sm btn-outline-info" title="Xem phiếu">
+                                        <i class="fas fa-file-alt"></i>
+                                    </a>
+
+                                    <!-- Gia hạn -->
+                                    <form th:if="${borrow.status.name() == 'BORROWED' and borrow.renewCount < 2}"
+                                          th:action="@{/user/renew/{id}(id=${borrow.id})}"
+                                          method="post"
+                                          onsubmit="return confirm('Gia hạn thêm 7 ngày?')">
+                                        <button type="submit" class="btn btn-sm btn-warning"
+                                                title="Gia hạn 7 ngày">
+                                            <i class="fas fa-redo"></i> Gia hạn
+                                        </button>
+                                    </form>
+
+                                    <!-- Hết lượt gia hạn -->
+                                    <span th:if="${borrow.status.name() == 'BORROWED' and borrow.renewCount >= 2}"
+                                          class="badge bg-secondary">Hết lượt gia hạn</span>
+
+                                    <span th:if="${borrow.status.name() == 'PENDING'
+                                               or borrow.status.name() == 'RETURNED'
+                                               or borrow.status.name() == 'REJECTED'
+                                               or borrow.status.name() == 'CONFIRMED'}"
+                                          class="text-muted small">—</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${borrows == null or #lists.isEmpty(borrows)}">
+                            <td colspan="9" class="text-center py-5 text-muted">
+                                <i class="fas fa-book fa-3x d-block mb-3"></i>
+                                Bạn chưa có phiếu mượn nào.<br>
+                                <a th:href="@{/books/list}" class="btn btn-primary mt-3">
+                                    <i class="fas fa-search me-2"></i>Tìm sách để mượn
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="user-footer mt-5">
+    <div class="container text-center">
+        <p class="mb-0"><i class="fas fa-book-open me-2"></i>Thư Viện Tri Thức Việt &copy; 2024 - Nhóm 4</p>
+    </div>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

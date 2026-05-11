@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><title>Thống kê</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link th:href="@{/css/admin.css}" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="wrapper">
+    <nav id="sidebar">
+        <div class="sidebar-header"><div class="brand-icon"><i class="fas fa-book-open"></i></div><h3>Thư Viện Tri Thức Việt</h3></div>
+        <ul class="list-unstyled components">
+            <li><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a th:href="@{/admin/books}"><i class="fas fa-book"></i> Quản lý sách</a></li>
+            <li><a th:href="@{/admin/borrows}"><i class="fas fa-clipboard-list"></i> Phiếu mượn</a></li>
+            <li><a th:href="@{/admin/readers}"><i class="fas fa-users"></i> Độc giả</a></li>
+            <li><a th:href="@{/admin/staff}"><i class="fas fa-user-tie"></i> Nhân viên</a></li>
+            <li class="active"><a th:href="@{/admin/statistics}"><i class="fas fa-chart-bar"></i> Thống kê</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <form th:action="@{/auth/logout}" method="post" style="margin:0">
+                <button type="submit" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                </button>
+            </form>
+        </div>
+    </nav>
+    <div id="content">
+        <nav class="navbar"><button id="sidebarCollapse" class="btn btn-toggle"><i class="fas fa-bars"></i></button>
+            <span class="navbar-brand ms-3">Thống kê & Báo cáo</span></nav>
+        <div class="container-fluid p-4">
+
+            <!-- Số liệu tổng quan -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="stat-card stat-card-blue">
+                        <div class="stat-icon"><i class="fas fa-book"></i></div>
+                        <div class="stat-info"><h3 th:text="${totalBooks}">0</h3><p>Tổng số sách</p></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card stat-card-green">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-info"><h3 th:text="${totalReaders}">0</h3><p>Độc giả</p></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card stat-card-orange">
+                        <div class="stat-icon"><i class="fas fa-exchange-alt"></i></div>
+                        <div class="stat-info"><h3 th:text="${totalBorrows}">0</h3><p>Tổng phiếu mượn</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Biểu đồ -->
+            <div class="row g-4">
+                <!-- Biểu đồ trạng thái -->
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-pie-chart me-2"></i>Phiếu mượn theo trạng thái</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="statusChart" height="250"></canvas>
+                            <!-- Truyền data qua hidden spans -->
+                            <div id="statusData" style="display:none">
+                                <span th:each="entry : ${borrowsByStatus}"
+                                      th:data-label="${entry.key}"
+                                      th:data-value="${entry.value}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Biểu đồ top sách -->
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Top 5 sách được mượn nhiều nhất</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="topBooksChart" height="250"></canvas>
+                            <div id="topBooksData" style="display:none">
+                                <span th:each="entry : ${topBooks}"
+                                      th:data-label="${entry.key}"
+                                      th:data-value="${entry.value}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bảng chi tiết trạng thái -->
+            <div class="row g-4 mt-2">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-table me-2"></i>Chi tiết theo trạng thái</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr><th>Trạng thái</th><th>Số lượng</th><th>Tỷ lệ</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="entry : ${borrowsByStatus}">
+                                        <td>
+                                            <span th:switch="${entry.key}">
+                                                <span th:case="'PENDING'" class="badge bg-warning text-dark">Chờ duyệt</span>
+                                                <span th:case="'CONFIRMED'" class="badge bg-info text-dark">Chờ nhận tiền</span>
+                                                <span th:case="'BORROWED'" class="badge bg-primary">Đang mượn</span>
+                                                <span th:case="'RETURNED'" class="badge bg-success">Đã trả</span>
+                                                <span th:case="'OVERDUE'" class="badge bg-danger">Quá hạn</span>
+                                                <span th:case="'REJECTED'" class="badge bg-secondary">Từ chối</span>
+                                            </span>
+                                        </td>
+                                        <td th:text="${entry.value}"></td>
+                                        <td>
+                                            <div class="progress" style="height:20px">
+                                                <div class="progress-bar"
+                                                     th:style="'width:' + (${entry.value} * 100 / ${totalBorrows}) + '%'"
+                                                     th:text="${#numbers.formatDecimal(entry.value * 100.0 / totalBorrows, 0, 'POINT', 1, 'POINT')} + '%'">
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // Đọc data từ hidden spans
+    function readChartData(containerId) {
+        const spans = document.querySelectorAll('#' + containerId + ' span');
+        const labels = [], values = [];
+        spans.forEach(span => {
+            labels.push(span.getAttribute('data-label'));
+            values.push(parseInt(span.getAttribute('data-value')));
+        });
+        return { labels, values };
+    }
+
+    // Biểu đồ trạng thái
+    const statusData = readChartData('statusData');
+    if (statusData.labels.length > 0) {
+        new Chart(document.getElementById('statusChart'), {
+            type: 'doughnut',
+            data: {
+                labels: statusData.labels.map(l => {
+                    const map = {
+                        'PENDING': 'Chờ duyệt', 'CONFIRMED': 'Chờ nhận tiền',
+                        'BORROWED': 'Đang mượn', 'RETURNED': 'Đã trả',
+                        'OVERDUE': 'Quá hạn', 'REJECTED': 'Từ chối'
+                    };
+                    return map[l] || l;
+                }),
+                datasets: [{
+                    data: statusData.values,
+                    backgroundColor: ['#f59e0b','#06b6d4','#3b82f6','#10b981','#ef4444','#6b7280']
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+    }
+
+    // Biểu đồ top sách
+    const topData = readChartData('topBooksData');
+    if (topData.labels.length > 0) {
+        new Chart(document.getElementById('topBooksChart'), {
+            type: 'bar',
+            data: {
+                labels: topData.labels.map(k => k.length > 20 ? k.substring(0,20)+'...' : k),
+                datasets: [{
+                    label: 'Số lần mượn',
+                    data: topData.values,
+                    backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+            }
+        });
+    }
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

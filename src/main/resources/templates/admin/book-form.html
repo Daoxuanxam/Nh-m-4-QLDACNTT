@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Form sách</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link th:href="@{/css/admin.css}" rel="stylesheet">
+</head>
+<body>
+<div class="wrapper">
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-icon"><i class="fas fa-book-open"></i></div>
+            <h3>Thư Viện Tri Thức Việt</h3>
+        </div>
+        <ul class="list-unstyled components">
+            <li><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li class="active"><a th:href="@{/admin/books}"><i class="fas fa-book"></i> Quản lý sách</a></li>
+            <li><a th:href="@{/admin/borrows}"><i class="fas fa-clipboard-list"></i> Phiếu mượn</a></li>
+            <li><a th:href="@{/admin/readers}"><i class="fas fa-users"></i> Độc giả</a></li>
+            <li><a th:href="@{/admin/staff}"><i class="fas fa-user-tie"></i> Nhân viên</a></li>
+            <li><a th:href="@{/admin/statistics}"><i class="fas fa-chart-bar"></i> Thống kê</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <form th:action="@{/auth/logout}" method="post" style="margin:0">
+                <button type="submit" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <div id="content">
+        <nav class="navbar">
+            <button id="sidebarCollapse" class="btn btn-toggle"><i class="fas fa-bars"></i></button>
+            <span class="navbar-brand ms-3"
+                  th:text="${book.id != null} ? 'Chỉnh sửa sách' : 'Thêm sách mới'"></span>
+        </nav>
+
+        <div class="container-fluid p-4">
+            <div class="card shadow-sm" style="max-width:800px;margin:auto">
+                <div class="card-header">
+                    <h5 class="mb-0" th:text="${book.id != null} ? 'Chỉnh sửa sách' : 'Thêm sách mới'"></h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/admin/books/save}" method="post" th:object="${book}">
+                        <input type="hidden" th:field="*{id}">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Tên sách <span class="text-danger">*</span></label>
+                                <input type="text" th:field="*{title}" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Tác giả</label>
+                                <input type="text" th:field="*{author}" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">NXB</label>
+                                <input type="text" th:field="*{publisher}" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">ISBN</label>
+                                <input type="text" th:field="*{isbn}" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Ngày xuất bản</label>
+                                <input type="date" th:field="*{publishDate}" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Tổng số lượng</label>
+                                <input type="number" th:field="*{totalCopies}" class="form-control" min="0">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Số lượng còn lại</label>
+                                <input type="number" th:field="*{availableCopies}" class="form-control" min="0">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Giá tiền (VND)</label>
+                                <input type="number" th:field="*{price}" class="form-control" min="0">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Thể loại</label>
+                                <!-- Dùng categoryId riêng thay vì category.id để tránh lỗi binding -->
+                                <select name="categoryId" class="form-select">
+                                    <option value="">-- Chọn thể loại --</option>
+                                    <option th:each="cat : ${categories}"
+                                            th:value="${cat.id}"
+                                            th:text="${cat.name}"
+                                            th:selected="${book.category != null and book.category.id == cat.id}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Ảnh bìa (URL)</label>
+                                <input type="text" th:field="*{coverImage}" class="form-control"
+                                       placeholder="https://example.com/image.jpg">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Mô tả</label>
+                                <textarea th:field="*{description}" class="form-control" rows="4"
+                                          placeholder="Mô tả nội dung sách..."></textarea>
+                            </div>
+                        </div>
+                        <div class="mt-4 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-save me-2"></i>Lưu sách
+                            </button>
+                            <a th:href="@{/admin/books}" class="btn btn-outline-secondary px-4">
+                                <i class="fas fa-arrow-left me-2"></i>Quay lại
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

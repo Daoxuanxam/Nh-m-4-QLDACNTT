@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Kho sách - Thư Viện Tri Thức Việt</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link th:href="@{/css/user.css}" rel="stylesheet">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg user-navbar">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/user/home}">
+            <i class="fas fa-book-open me-2"></i>Thư Viện Tri Thức Việt
+        </a>
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/user/home}">
+                        <i class="fas fa-home me-1"></i>Trang chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" th:href="@{/books/list}">
+                        <i class="fas fa-book me-1"></i>Kho sách</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link" th:href="@{/user/my-borrows}">
+                        <i class="fas fa-clipboard me-1"></i>Sách của tôi</a>
+                </li>
+            </ul>
+            <div class="navbar-nav">
+                <li class="nav-item" sec:authorize="!isAuthenticated()">
+                    <a class="nav-link" th:href="@{/auth/login}">
+                        <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập</a>
+                </li>
+                <li class="nav-item" sec:authorize="!isAuthenticated()">
+                    <a class="btn btn-light ms-2" th:href="@{/auth/register}">Đăng ký</a>
+                </li>
+                <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-1"></i>
+                        <span sec:authentication="name"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" th:href="@{/user/profile}">
+                            <i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                        <li><a class="dropdown-item" th:href="@{/user/my-borrows}">
+                            <i class="fas fa-book me-2"></i>Sách đang mượn</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/auth/logout}" method="post" style="margin:0">
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- HEADER -->
+<div style="background: linear-gradient(135deg, #1e293b, #0f172a); padding: 2rem 0;">
+    <div class="container">
+        <h2 style="color:white; font-weight:800; margin:0;">
+            <i class="fas fa-book me-2" style="color:#e94560"></i>Kho sách
+        </h2>
+        <p style="color:rgba(255,255,255,0.6); margin:0.5rem 0 0;">
+            Tìm kiếm và khám phá tất cả đầu sách trong thư viện
+        </p>
+    </div>
+</div>
+
+<div class="container my-4">
+
+    <!-- BỘ LỌC NÂNG CAO -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form th:action="@{/books/list}" method="get">
+                <div class="row g-3">
+                    <!-- Tìm kiếm -->
+                    <div class="col-md-5">
+                        <label class="form-label fw-bold">
+                            <i class="fas fa-search me-1"></i>Tìm kiếm
+                        </label>
+                        <input type="text" name="search" class="form-control"
+                               placeholder="Tên sách, tác giả..."
+                               th:value="${search}">
+                    </div>
+                    <!-- Thể loại -->
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">
+                            <i class="fas fa-tags me-1"></i>Thể loại
+                        </label>
+                        <select name="categoryId" class="form-select">
+                            <option value="">Tất cả thể loại</option>
+                            <option th:each="cat : ${categories}"
+                                    th:value="${cat.id}"
+                                    th:text="${cat.name}"
+                                    th:selected="${selectedCategory == cat.id}"></option>
+                        </select>
+                    </div>
+                    <!-- Sắp xếp -->
+                    <div class="col-md-2">
+                        <label class="form-label fw-bold">
+                            <i class="fas fa-sort me-1"></i>Sắp xếp
+                        </label>
+                        <select name="sort" class="form-select">
+                            <option value="newest" th:selected="${sort == 'newest'}">Mới nhất</option>
+                            <option value="oldest" th:selected="${sort == 'oldest'}">Cũ nhất</option>
+                            <option value="az" th:selected="${sort == 'az'}">A → Z</option>
+                            <option value="za" th:selected="${sort == 'za'}">Z → A</option>
+                        </select>
+                    </div>
+                    <!-- Nút lọc -->
+                    <div class="col-md-2 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter me-1"></i>Lọc
+                        </button>
+                        <a th:href="@{/books/list}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </div>
+                    <!-- Checkbox còn sách -->
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="availableOnly"
+                                   id="availableOnly" value="true"
+                                   th:checked="${availableOnly}">
+                            <label class="form-check-label fw-bold" for="availableOnly">
+             
+                                Chỉ hiện sách còn trong kho
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lọc nhanh theo thể loại -->
+    <div class="d-flex gap-2 flex-wrap mb-4">
+        <a th:href="@{/books/list}" class="btn btn-category"
+           th:classappend="${selectedCategory == null and search == null} ? ' active' : ''">
+            Tất cả
+        </a>
+        <a th:each="cat : ${categories}"
+           th:href="@{/books/list(categoryId=${cat.id})}"
+           class="btn btn-category"
+           th:classappend="${selectedCategory == cat.id} ? ' active' : ''"
+           th:text="${cat.name}"></a>
+    </div>
+
+    <!-- Kết quả -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="section-title mb-0">
+            <i class="fas fa-list me-2"></i>
+            <span th:if="${search != null and !#strings.isEmpty(search)}"
+                  th:text="'Kết quả: &quot;' + ${search} + '&quot;'"></span>
+            <span th:if="${search == null or #strings.isEmpty(search)}">Tất cả sách</span>
+            <span class="badge bg-primary ms-2" th:text="${#lists.size(books)}"></span>
+        </h5>
+        <small class="text-muted" th:if="${availableOnly}">
+            <i class="fas fa-filter me-1 text-success"></i>Đang lọc: Còn sách
+        </small>
+    </div>
+
+    <!-- Danh sách sách -->
+    <div class="row g-4">
+        <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6" th:each="book : ${books}">
+            <a th:href="@{/books/detail/{id}(id=${book.id})}" class="text-decoration-none">
+                <div class="book-card">
+                    <div class="book-cover">
+                        <img th:if="${book.coverImage != null and !#strings.isEmpty(book.coverImage)}"
+                             th:src="${book.coverImage}" alt="Bìa sách" class="book-img">
+                        <div th:if="${book.coverImage == null or #strings.isEmpty(book.coverImage)}"
+                             class="book-placeholder">
+                            <i class="fas fa-book fa-3x"></i>
+                        </div>
+                        <div class="book-overlay">
+                            <span class="btn btn-light btn-sm">Xem chi tiết</span>
+                        </div>
+                        <span class="book-status-badge"
+                              th:classappend="${book.availableCopies > 0} ? ' badge-available' : ' badge-unavailable'"
+                              th:text="${book.availableCopies > 0} ? 'Có sẵn' : 'Hết sách'"></span>
+                    </div>
+                    <div class="book-info">
+                        <h6 class="book-title" th:text="${book.title}"></h6>
+                        <p class="book-author" th:text="${book.author}"></p>
+                        <small class="book-category" th:if="${book.category != null}"
+                               th:text="${book.category.name}"></small>
+                        <div th:if="${book.price > 0}" class="mt-1">
+                            <span class="fw-bold text-danger" style="font-size:0.8rem"
+                                  th:text="${#numbers.formatDecimal(book.price, 0, 'COMMA', 0, 'POINT') + ' đ'}"></span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div th:if="${#lists.isEmpty(books)}" class="col-12 text-center py-5">
+            <i class="fas fa-search fa-3x text-muted mb-3 d-block"></i>
+            <h5 class="text-muted">Không tìm thấy sách nào</h5>
+            <a th:href="@{/books/list}" class="btn btn-primary mt-3">
+                <i class="fas fa-times me-2"></i>Xóa bộ lọc
+            </a>
+        </div>
+    </div>
+</div>
+
+<footer class="user-footer mt-5">
+    <div class="container text-center">
+        <p class="mb-0">
+            <i class="fas fa-book-open me-2"></i>Thư Viện Tri Thức Việt &copy; 2024 - Nhóm 4
+        </p>
+    </div>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

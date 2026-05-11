@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Phiếu xác nhận mượn sách</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Nunito', sans-serif; }
+        body { background: #f5f5f5; }
+        .receipt-card {
+            max-width: 700px; margin: 40px auto; background: white;
+            border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .receipt-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white; padding: 30px; text-align: center;
+        }
+        .receipt-header h2 { font-size: 1.5rem; font-weight: 800; margin: 0; }
+        .receipt-code {
+            font-size: 2rem; font-weight: 900;
+            letter-spacing: 3px; margin-top: 10px;
+        }
+        .receipt-body { padding: 30px; }
+        .info-row {
+            display: flex; justify-content: space-between;
+            padding: 12px 0; border-bottom: 1px solid #f0f0f0;
+        }
+        .info-label { color: #666; font-weight: 600; }
+        .info-value { font-weight: 700; color: #333; }
+        .fee-box {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white; border-radius: 12px;
+            padding: 20px; text-align: center; margin: 20px 0;
+        }
+        .fee-amount { font-size: 2.5rem; font-weight: 900; }
+        .notice-box {
+            background: #fff3cd; border: 1px solid #ffc107;
+            border-radius: 8px; padding: 15px; margin: 15px 0;
+        }
+        @media print {
+            .no-print { display: none; }
+            body { background: white; }
+            .receipt-card { box-shadow: none; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+<div class="receipt-card">
+    <div class="receipt-header">
+        <div><i class="fas fa-book-open fa-2x mb-2"></i></div>
+        <h2>THƯ VIỆN TRI THỨC VIỆT</h2>
+        <div>PHIẾU XÁC NHẬN MƯỢN SÁCH</div>
+        <div class="receipt-code" th:text="${borrow.receiptCode}"></div>
+    </div>
+
+    <div class="receipt-body">
+        <div class="info-row">
+            <span class="info-label"><i class="fas fa-user me-2"></i>Độc giả</span>
+            <span class="info-value" th:text="${borrow.reader.user.fullName}"></span>
+        </div>
+        <div class="info-row">
+            <span class="info-label"><i class="fas fa-id-card me-2"></i>Mã thẻ</span>
+            <span class="info-value" th:text="${borrow.reader.readerCode}"></span>
+        </div>
+        <div class="info-row">
+            <span class="info-label"><i class="fas fa-book me-2"></i>Tên sách</span>
+            <span class="info-value" th:text="${borrow.book.title}"></span>
+        </div>
+        <div class="info-row">
+            <span class="info-label"><i class="fas fa-pen me-2"></i>Tác giả</span>
+            <span class="info-value" th:text="${borrow.book.author}"></span>
+        </div>
+        <div class="info-row">
+            <span class="info-label"><i class="fas fa-calendar me-2"></i>Ngày mượn</span>
+            <span class="info-value" th:text="${borrow.borrowDate}"></span>
+        </div>
+        <div class="info-row">
+            <span class="info-label"><i class="fas fa-calendar-times me-2"></i>Hạn trả</span>
+            <span class="info-value text-danger" th:text="${borrow.dueDate}"></span>
+        </div>
+
+        <div class="fee-box">
+            <div class="mb-1"><i class="fas fa-money-bill-wave me-2"></i>PHÍ MƯỢN SÁCH</div>
+            <div class="fee-amount"
+                 th:text="${#numbers.formatDecimal(borrow.borrowFee, 0, 'COMMA', 0, 'POINT') + ' đ'}"></div>
+            <div class="small mt-1">Vui lòng nộp tại quầy thư viện</div>
+        </div>
+
+        <div class="notice-box">
+            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+            <strong>Lưu ý:</strong> Mang phiếu này đến thư viện, nộp phí và nhận sách
+            trong vòng <strong>3 ngày</strong>. Quá thời hạn, phiếu sẽ bị hủy.
+        </div>
+
+        <div class="d-flex gap-2 justify-content-center no-print mt-3">
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print me-2"></i>In phiếu
+            </button>
+            <a th:href="@{/user/my-borrows}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Phiếu mượn của tôi
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

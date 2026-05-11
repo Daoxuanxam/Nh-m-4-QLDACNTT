@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Phiếu mượn</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link th:href="@{/css/admin.css}" rel="stylesheet">
+</head>
+<body>
+<div class="wrapper">
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-icon"><i class="fas fa-book-open"></i></div>
+            <h3>Thư Viện Tri Thức Việt</h3>
+        </div>
+        <ul class="list-unstyled components">
+            <li><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a th:href="@{/admin/books}"><i class="fas fa-book"></i> Quản lý sách</a></li>
+            <li class="active"><a th:href="@{/admin/borrows}"><i class="fas fa-clipboard-list"></i> Phiếu mượn</a></li>
+            <li><a th:href="@{/admin/readers}"><i class="fas fa-users"></i> Độc giả</a></li>
+            <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/staff}"><i class="fas fa-user-tie"></i> Nhân viên</a></li>
+            <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/statistics}"><i class="fas fa-chart-bar"></i> Thống kê</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <form th:action="@{/auth/logout}" method="post" style="margin:0">
+                <button type="submit" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <div id="content">
+        <nav class="navbar">
+            <button id="sidebarCollapse" class="btn btn-toggle"><i class="fas fa-bars"></i></button>
+            <span class="navbar-brand ms-3">Quản lý phiếu mượn</span>
+        </nav>
+        <div class="container-fluid p-4">
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <i class="fas fa-check-circle me-2"></i><span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${warning}" class="alert alert-warning alert-dismissible fade show">
+                <i class="fas fa-exclamation-triangle me-2"></i><span th:text="${warning}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Filter buttons -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a th:href="@{/admin/borrows}" class="btn btn-outline-secondary btn-sm">Tất cả</a>
+                        <a th:href="@{/admin/borrows(status='PENDING')}" class="btn btn-outline-warning btn-sm">Chờ duyệt</a>
+                        <a th:href="@{/admin/borrows(status='CONFIRMED')}" class="btn btn-outline-info btn-sm">Chờ nhận tiền</a>
+                        <a th:href="@{/admin/borrows(status='BORROWED')}" class="btn btn-outline-primary btn-sm">Đang mượn</a>
+                        <a th:href="@{/admin/borrows(status='RETURNED')}" class="btn btn-outline-success btn-sm">Đã trả</a>
+                        <a th:href="@{/admin/borrows(status='OVERDUE')}" class="btn btn-outline-danger btn-sm">Quá hạn</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Danh sách phiếu mượn
+                        <span class="badge bg-primary ms-2" th:text="${#lists.size(borrows)}"></span>
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th><th>Mã phiếu</th><th>Độc giả</th><th>Sách</th>
+                                    <th>Phí mượn</th><th>Hạn trả</th><th>Trạng thái</th><th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="borrow, i : ${borrows}">
+                                    <td th:text="${i.count}"></td>
+                                    <td>
+                                        <span th:text="${borrow.receiptCode != null ? borrow.receiptCode : '—'}"
+                                              class="text-muted small"></span>
+                                    </td>
+                                    <td>
+                                        <strong th:text="${borrow.reader.user.fullName}"></strong><br>
+                                        <small class="text-muted" th:text="${borrow.reader.readerCode}"></small>
+                                    </td>
+                                    <td th:text="${borrow.book.title}"></td>
+                                    <td>
+                                        <span th:if="${borrow.borrowFee > 0}" class="text-danger fw-bold"
+                                              th:text="${#numbers.formatDecimal(borrow.borrowFee, 0, 'COMMA', 0, 'POINT') + 'đ'}"></span>
+                                        <span th:if="${borrow.borrowFee == 0}" class="text-muted">—</span>
+                                    </td>
+                                    <td>
+                                        <span th:class="${borrow.dueDate != null and borrow.dueDate.isBefore(T(java.time.LocalDate).now()) and borrow.status.name() == 'BORROWED'} ? 'text-danger fw-bold' : ''"
+                                              th:text="${borrow.dueDate}"></span>
+                                    </td>
+                                    <td>
+                                        <span th:switch="${borrow.status.name()}">
+                                            <span th:case="'PENDING'" class="badge bg-warning text-dark">Chờ duyệt</span>
+                                            <span th:case="'CONFIRMED'" class="badge bg-info text-dark">Chờ nhận tiền</span>
+                                            <span th:case="'BORROWED'" class="badge bg-primary">Đang mượn</span>
+                                            <span th:case="'RETURNED'" class="badge bg-success">Đã trả</span>
+                                            <span th:case="'OVERDUE'" class="badge bg-danger">Quá hạn</span>
+                                            <span th:case="'REJECTED'" class="badge bg-secondary">Từ chối</span>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <!-- PENDING: Duyệt / Từ chối -->
+                                        <div th:if="${borrow.status.name() == 'PENDING'}" class="d-flex gap-1">
+                                            <form th:action="@{/admin/borrows/approve/{id}(id=${borrow.id})}" method="post">
+                                                <button type="submit" class="btn btn-sm btn-success" title="Duyệt">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </form>
+                                            <form th:action="@{/admin/borrows/reject/{id}(id=${borrow.id})}" method="post">
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Từ chối">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <!-- CONFIRMED: Xem phiếu / Xác nhận nhận tiền -->
+                                        <div th:if="${borrow.status.name() == 'CONFIRMED'}" class="d-flex gap-1">
+                                            <a th:href="@{/admin/borrows/receipt/{id}(id=${borrow.id})}"
+                                               class="btn btn-sm btn-info" title="Xem phiếu">
+                                                <i class="fas fa-file-alt"></i>
+                                            </a>
+                                            <form th:action="@{/admin/borrows/confirm-payment/{id}(id=${borrow.id})}" method="post">
+                                                <button type="submit" class="btn btn-sm btn-success" title="Xác nhận đã nhận tiền">
+                                                    <i class="fas fa-money-bill-wave"></i> Nhận tiền
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <!-- BORROWED: Trả sách -->
+                                        <div th:if="${borrow.status.name() == 'BORROWED'}">
+                                            <form th:action="@{/admin/borrows/return/{id}(id=${borrow.id})}" method="post">
+                                                <button type="submit" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-undo"></i> Trả
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <span th:if="${borrow.status.name() == 'RETURNED' or borrow.status.name() == 'REJECTED'}"
+                                              class="text-muted small">—</span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(borrows)}">
+                                    <td colspan="8" class="text-center py-4 text-muted">
+                                        <i class="fas fa-inbox fa-2x d-block mb-2"></i>Không có phiếu mượn
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

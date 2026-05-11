@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"><title>Quản lý độc giả</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link th:href="@{/css/admin.css}" rel="stylesheet">
+</head>
+<body>
+<div class="wrapper">
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-icon"><i class="fas fa-book-open"></i></div>
+            <h3>Thư Viện Tri Thức Việt</h3>
+        </div>
+        <ul class="list-unstyled components">
+            <li><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a th:href="@{/admin/books}"><i class="fas fa-book"></i> Quản lý sách</a></li>
+            <li><a th:href="@{/admin/borrows}"><i class="fas fa-clipboard-list"></i> Phiếu mượn</a></li>
+            <li class="active"><a th:href="@{/admin/readers}"><i class="fas fa-users"></i> Độc giả</a></li>
+            <li><a th:href="@{/admin/staff}"><i class="fas fa-user-tie"></i> Nhân viên</a></li>
+            <li><a th:href="@{/admin/statistics}"><i class="fas fa-chart-bar"></i> Thống kê</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <form th:action="@{/auth/logout}" method="post" style="margin:0">
+                <button type="submit" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <div id="content">
+        <nav class="navbar">
+            <button id="sidebarCollapse" class="btn btn-toggle"><i class="fas fa-bars"></i></button>
+            <span class="navbar-brand ms-3">Quản lý độc giả</span>
+        </nav>
+
+        <div class="container-fluid p-4">
+
+            <!-- Thông báo thành công -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <i class="fas fa-check-circle me-2"></i>
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Thông báo lỗi -->
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-id-card me-2"></i>Danh sách độc giả
+                        <span class="badge bg-primary ms-2" th:text="${#lists.size(readers)}"></span>
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th><th>Mã thẻ</th><th>Họ tên</th><th>Email</th>
+                                    <th>SĐT</th><th>Ngày tham gia</th><th>Hết hạn</th>
+                                    <th>Đang mượn</th><th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="reader, i : ${readers}">
+                                    <td th:text="${i.count}"></td>
+                                    <td>
+                                        <span class="badge bg-primary"
+                                              th:text="${reader.readerCode}"></span>
+                                    </td>
+                                    <td th:text="${reader.user.fullName}"></td>
+                                    <td th:text="${reader.user.email}"></td>
+                                    <td th:text="${reader.user.phone}"></td>
+                                    <td th:text="${reader.memberSince}"></td>
+                                    <td>
+                                        <span th:class="${reader.memberExpiry != null
+                                            and reader.memberExpiry.isBefore(T(java.time.LocalDate).now())}
+                                            ? 'text-danger' : 'text-success'"
+                                              th:text="${reader.memberExpiry}"></span>
+                                    </td>
+                                    <td>
+                                        <span th:with="count=${borrowingCount[reader.id] != null
+                                                ? borrowingCount[reader.id] : 0}"
+                                              th:class="${count > 0} ? 'badge bg-danger' : 'badge bg-secondary'"
+                                              th:text="${count}"></span>
+                                    </td>
+                                    <td>
+                                        <!-- Nút xóa: disable nếu đang mượn sách -->
+                                        <span th:with="count=${borrowingCount[reader.id] != null
+                                                ? borrowingCount[reader.id] : 0}">
+                                            <form th:if="${count == 0}"
+                                                  th:action="@{/admin/readers/delete/{id}(id=${reader.id})}"
+                                                  method="post" style="display:inline"
+                                                  onsubmit="return confirm('Xóa độc giả này? Toàn bộ lịch sử mượn cũng sẽ bị xóa!')">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                        title="Xóa độc giả">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                            <button th:if="${count > 0}"
+                                                    class="btn btn-sm btn-secondary"
+                                                    disabled
+                                                    title="Không thể xóa vì đang mượn sách">
+                                                <i class="fas fa-lock"></i>
+                                            </button>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(readers)}">
+                                    <td colspan="9" class="text-center py-4 text-muted">
+                                        Chưa có độc giả nào
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>
