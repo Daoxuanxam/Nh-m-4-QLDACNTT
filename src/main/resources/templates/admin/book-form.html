@@ -25,6 +25,7 @@
         </ul>
         <div class="sidebar-footer">
             <form th:action="@{/auth/logout}" method="post" style="margin:0">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                 <button type="submit" class="btn-logout">
                     <i class="fas fa-sign-out-alt"></i> Đăng xuất
                 </button>
@@ -47,6 +48,7 @@
                 <div class="card-body">
                     <form th:action="@{/admin/books/save}" method="post" th:object="${book}">
                         <input type="hidden" th:field="*{id}">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                         <div class="row g-3">
                             <div class="col-12">
                                 <label class="form-label fw-bold">Tên sách <span class="text-danger">*</span></label>
@@ -82,7 +84,6 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Thể loại</label>
-                                <!-- Dùng categoryId riêng thay vì category.id để tránh lỗi binding -->
                                 <select name="categoryId" class="form-select">
                                     <option value="">-- Chọn thể loại --</option>
                                     <option th:each="cat : ${categories}"
