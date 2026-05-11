@@ -81,7 +81,7 @@ public class BookController {
     }
 
     // ===== TRANG CHỦ — chỉ hiện 6 sách mới nhất =====
-    @GetMapping({"/", "/user/home"})
+    @GetMapping({"/user/home"})
     public String home(Model model) {
         model.addAttribute("books", bookService.findLatest6());
         model.addAttribute("categories", categoryRepository.findAll());
