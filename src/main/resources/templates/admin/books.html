@@ -17,17 +17,17 @@
             <h3>Thư Viện Tri Thức Việt</h3>
         </div>
         <ul class="list-unstyled components">
-            <li><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-            <li class="active"><a th:href="@{/admin/books}"><i class="fas fa-book"></i> Quản lý sách</a></li>
-            <li><a th:href="@{/admin/borrows}"><i class="fas fa-clipboard-list"></i> Phiếu mượn</a></li>
-            <li><a th:href="@{/admin/readers}"><i class="fas fa-users"></i> Độc giả</a></li>
-            <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/staff}"><i class="fas fa-user-tie"></i> Nhân viên</a></li>
-            <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/statistics}"><i class="fas fa-chart-bar"></i> Thống kê</a></li>
+            <li><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+            <li class="active"><a th:href="@{/admin/books}"><i class="fas fa-book"></i> <span>Quản lý sách</span></a></li>
+            <li><a th:href="@{/admin/borrows}"><i class="fas fa-clipboard-list"></i> <span>Phiếu mượn</span></a></li>
+            <li><a th:href="@{/admin/readers}"><i class="fas fa-users"></i> <span>Độc giả</span></a></li>
+            <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/staff}"><i class="fas fa-user-tie"></i> <span>Nhân viên</span></a></li>
+            <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/statistics}"><i class="fas fa-chart-bar"></i> <span>Thống kê</span></a></li>
         </ul>
         <div class="sidebar-footer">
             <form th:action="@{/auth/logout}" method="post" style="margin:0">
                 <button type="submit" class="btn-logout">
-                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    <i class="fas fa-sign-out-alt"></i> <span>Đăng xuất</span>
                 </button>
             </form>
         </div>
@@ -39,8 +39,6 @@
             <span class="navbar-brand ms-3">Quản lý sách</span>
         </nav>
         <div class="container-fluid p-4">
-
-            <!-- Alerts -->
             <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
                 <i class="fas fa-check-circle me-2"></i><span th:text="${success}"></span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -49,8 +47,6 @@
                 <i class="fas fa-exclamation-circle me-2"></i><span th:text="${error}"></span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-
-            <!-- Search & Add -->
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <div class="row align-items-center">
@@ -70,8 +66,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Books Table -->
             <div class="card shadow-sm">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="fas fa-list me-2"></i>Danh sách sách

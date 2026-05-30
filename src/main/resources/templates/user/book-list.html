@@ -123,13 +123,10 @@
                         </select>
                     </div>
                     <!-- Nút lọc -->
-                    <div class="col-md-2 d-flex align-items-end gap-2">
+                    <div class="col-md-2 d-flex align-items-end">
                         <button type="submit" class="btn btn-primary w-100">
                             <i class="fas fa-filter me-1"></i>Lọc
                         </button>
-                        <a th:href="@{/books/list}" class="btn btn-outline-secondary">
-                            <i class="fas fa-times"></i>
-                        </a>
                     </div>
                     <!-- Checkbox còn sách -->
                     <div class="col-12">
@@ -138,7 +135,6 @@
                                    id="availableOnly" value="true"
                                    th:checked="${availableOnly}">
                             <label class="form-check-label fw-bold" for="availableOnly">
-             
                                 Chỉ hiện sách còn trong kho
                             </label>
                         </div>

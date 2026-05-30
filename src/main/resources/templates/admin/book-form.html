@@ -16,18 +16,18 @@
             <h3>Thư Viện Tri Thức Việt</h3>
         </div>
         <ul class="list-unstyled components">
-            <li><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-            <li class="active"><a th:href="@{/admin/books}"><i class="fas fa-book"></i> Quản lý sách</a></li>
-            <li><a th:href="@{/admin/borrows}"><i class="fas fa-clipboard-list"></i> Phiếu mượn</a></li>
-            <li><a th:href="@{/admin/readers}"><i class="fas fa-users"></i> Độc giả</a></li>
-            <li><a th:href="@{/admin/staff}"><i class="fas fa-user-tie"></i> Nhân viên</a></li>
-            <li><a th:href="@{/admin/statistics}"><i class="fas fa-chart-bar"></i> Thống kê</a></li>
+            <li><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+            <li class="active"><a th:href="@{/admin/books}"><i class="fas fa-book"></i> <span>Quản lý sách</span></a></li>
+            <li><a th:href="@{/admin/borrows}"><i class="fas fa-clipboard-list"></i> <span>Phiếu mượn</span></a></li>
+            <li><a th:href="@{/admin/readers}"><i class="fas fa-users"></i> <span>Độc giả</span></a></li>
+            <li><a th:href="@{/admin/staff}"><i class="fas fa-user-tie"></i> <span>Nhân viên</span></a></li>
+            <li><a th:href="@{/admin/statistics}"><i class="fas fa-chart-bar"></i> <span>Thống kê</span></a></li>
         </ul>
         <div class="sidebar-footer">
             <form th:action="@{/auth/logout}" method="post" style="margin:0">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                 <button type="submit" class="btn-logout">
-                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    <i class="fas fa-sign-out-alt"></i> <span>Đăng xuất</span>
                 </button>
             </form>
         </div>
@@ -39,7 +39,6 @@
             <span class="navbar-brand ms-3"
                   th:text="${book.id != null} ? 'Chỉnh sửa sách' : 'Thêm sách mới'"></span>
         </nav>
-
         <div class="container-fluid p-4">
             <div class="card shadow-sm" style="max-width:800px;margin:auto">
                 <div class="card-header">
@@ -59,7 +58,7 @@
                                 <input type="text" th:field="*{author}" class="form-control">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">NXB</label>
+                                <label class="form-label fw-bold">Năm sinh</label>
                                 <input type="text" th:field="*{publisher}" class="form-control">
                             </div>
                             <div class="col-md-6">
@@ -67,7 +66,7 @@
                                 <input type="text" th:field="*{isbn}" class="form-control">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Ngày xuất bản</label>
+                                <label class="form-label fw-bold">NXB</label>
                                 <input type="date" th:field="*{publishDate}" class="form-control">
                             </div>
                             <div class="col-md-4">

@@ -17,17 +17,17 @@
             <h3>Thư Viện Tri Thức Việt</h3>
         </div>
         <ul class="list-unstyled components">
-            <li><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-            <li><a th:href="@{/admin/books}"><i class="fas fa-book"></i> Quản lý sách</a></li>
-            <li class="active"><a th:href="@{/admin/borrows}"><i class="fas fa-clipboard-list"></i> Phiếu mượn</a></li>
-            <li><a th:href="@{/admin/readers}"><i class="fas fa-users"></i> Độc giả</a></li>
-            <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/staff}"><i class="fas fa-user-tie"></i> Nhân viên</a></li>
-            <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/statistics}"><i class="fas fa-chart-bar"></i> Thống kê</a></li>
+            <li><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+            <li><a th:href="@{/admin/books}"><i class="fas fa-book"></i> <span>Quản lý sách</span></a></li>
+            <li class="active"><a th:href="@{/admin/borrows}"><i class="fas fa-clipboard-list"></i> <span>Phiếu mượn</span></a></li>
+            <li><a th:href="@{/admin/readers}"><i class="fas fa-users"></i> <span>Độc giả</span></a></li>
+            <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/staff}"><i class="fas fa-user-tie"></i> <span>Nhân viên</span></a></li>
+            <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin/statistics}"><i class="fas fa-chart-bar"></i> <span>Thống kê</span></a></li>
         </ul>
         <div class="sidebar-footer">
             <form th:action="@{/auth/logout}" method="post" style="margin:0">
                 <button type="submit" class="btn-logout">
-                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    <i class="fas fa-sign-out-alt"></i> <span>Đăng xuất</span>
                 </button>
             </form>
         </div>
@@ -47,8 +47,6 @@
                 <i class="fas fa-exclamation-triangle me-2"></i><span th:text="${warning}"></span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-
-            <!-- Filter buttons -->
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
                     <div class="d-flex gap-2 flex-wrap">
@@ -61,7 +59,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="card shadow-sm">
                 <div class="card-header">
                     <h5 class="mb-0"><i class="fas fa-list me-2"></i>Danh sách phiếu mượn
@@ -80,10 +77,7 @@
                             <tbody>
                                 <tr th:each="borrow, i : ${borrows}">
                                     <td th:text="${i.count}"></td>
-                                    <td>
-                                        <span th:text="${borrow.receiptCode != null ? borrow.receiptCode : '—'}"
-                                              class="text-muted small"></span>
-                                    </td>
+                                    <td><span th:text="${borrow.receiptCode != null ? borrow.receiptCode : '—'}" class="text-muted small"></span></td>
                                     <td>
                                         <strong th:text="${borrow.reader.user.fullName}"></strong><br>
                                         <small class="text-muted" th:text="${borrow.reader.readerCode}"></small>
@@ -109,32 +103,24 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <!-- PENDING: Duyệt / Từ chối -->
                                         <div th:if="${borrow.status.name() == 'PENDING'}" class="d-flex gap-1">
                                             <form th:action="@{/admin/borrows/approve/{id}(id=${borrow.id})}" method="post">
-                                                <button type="submit" class="btn btn-sm btn-success" title="Duyệt">
-                                                    <i class="fas fa-check"></i>
-                                                </button>
+                                                <button type="submit" class="btn btn-sm btn-success"><i class="fas fa-check"></i></button>
                                             </form>
                                             <form th:action="@{/admin/borrows/reject/{id}(id=${borrow.id})}" method="post">
-                                                <button type="submit" class="btn btn-sm btn-danger" title="Từ chối">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
+                                                <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-times"></i></button>
                                             </form>
                                         </div>
-                                        <!-- CONFIRMED: Xem phiếu / Xác nhận nhận tiền -->
                                         <div th:if="${borrow.status.name() == 'CONFIRMED'}" class="d-flex gap-1">
-                                            <a th:href="@{/admin/borrows/receipt/{id}(id=${borrow.id})}"
-                                               class="btn btn-sm btn-info" title="Xem phiếu">
+                                            <a th:href="@{/admin/borrows/receipt/{id}(id=${borrow.id})}" class="btn btn-sm btn-info">
                                                 <i class="fas fa-file-alt"></i>
                                             </a>
                                             <form th:action="@{/admin/borrows/confirm-payment/{id}(id=${borrow.id})}" method="post">
-                                                <button type="submit" class="btn btn-sm btn-success" title="Xác nhận đã nhận tiền">
+                                                <button type="submit" class="btn btn-sm btn-success">
                                                     <i class="fas fa-money-bill-wave"></i> Nhận tiền
                                                 </button>
                                             </form>
                                         </div>
-                                        <!-- BORROWED: Trả sách -->
                                         <div th:if="${borrow.status.name() == 'BORROWED'}">
                                             <form th:action="@{/admin/borrows/return/{id}(id=${borrow.id})}" method="post">
                                                 <button type="submit" class="btn btn-sm btn-primary">
@@ -142,8 +128,7 @@
                                                 </button>
                                             </form>
                                         </div>
-                                        <span th:if="${borrow.status.name() == 'RETURNED' or borrow.status.name() == 'REJECTED'}"
-                                              class="text-muted small">—</span>
+                                        <span th:if="${borrow.status.name() == 'RETURNED' or borrow.status.name() == 'REJECTED'}" class="text-muted small">—</span>
                                     </td>
                                 </tr>
                                 <tr th:if="${#lists.isEmpty(borrows)}">

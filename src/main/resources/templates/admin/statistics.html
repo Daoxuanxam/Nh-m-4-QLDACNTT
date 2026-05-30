@@ -11,29 +11,32 @@
 <body>
 <div class="wrapper">
     <nav id="sidebar">
-        <div class="sidebar-header"><div class="brand-icon"><i class="fas fa-book-open"></i></div><h3>Thư Viện Tri Thức Việt</h3></div>
+        <div class="sidebar-header">
+            <div class="brand-icon"><i class="fas fa-book-open"></i></div>
+            <h3>Thư Viện Tri Thức Việt</h3>
+        </div>
         <ul class="list-unstyled components">
-            <li><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-            <li><a th:href="@{/admin/books}"><i class="fas fa-book"></i> Quản lý sách</a></li>
-            <li><a th:href="@{/admin/borrows}"><i class="fas fa-clipboard-list"></i> Phiếu mượn</a></li>
-            <li><a th:href="@{/admin/readers}"><i class="fas fa-users"></i> Độc giả</a></li>
-            <li><a th:href="@{/admin/staff}"><i class="fas fa-user-tie"></i> Nhân viên</a></li>
-            <li class="active"><a th:href="@{/admin/statistics}"><i class="fas fa-chart-bar"></i> Thống kê</a></li>
+            <li><a th:href="@{/admin/dashboard}"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+            <li><a th:href="@{/admin/books}"><i class="fas fa-book"></i> <span>Quản lý sách</span></a></li>
+            <li><a th:href="@{/admin/borrows}"><i class="fas fa-clipboard-list"></i> <span>Phiếu mượn</span></a></li>
+            <li><a th:href="@{/admin/readers}"><i class="fas fa-users"></i> <span>Độc giả</span></a></li>
+            <li><a th:href="@{/admin/staff}"><i class="fas fa-user-tie"></i> <span>Nhân viên</span></a></li>
+            <li class="active"><a th:href="@{/admin/statistics}"><i class="fas fa-chart-bar"></i> <span>Thống kê</span></a></li>
         </ul>
         <div class="sidebar-footer">
             <form th:action="@{/auth/logout}" method="post" style="margin:0">
                 <button type="submit" class="btn-logout">
-                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    <i class="fas fa-sign-out-alt"></i> <span>Đăng xuất</span>
                 </button>
             </form>
         </div>
     </nav>
     <div id="content">
-        <nav class="navbar"><button id="sidebarCollapse" class="btn btn-toggle"><i class="fas fa-bars"></i></button>
-            <span class="navbar-brand ms-3">Thống kê & Báo cáo</span></nav>
+        <nav class="navbar">
+            <button id="sidebarCollapse" class="btn btn-toggle"><i class="fas fa-bars"></i></button>
+            <span class="navbar-brand ms-3">Thống kê & Báo cáo</span>
+        </nav>
         <div class="container-fluid p-4">
-
-            <!-- Số liệu tổng quan -->
             <div class="row g-4 mb-4">
                 <div class="col-md-4">
                     <div class="stat-card stat-card-blue">
@@ -54,10 +57,7 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Biểu đồ -->
             <div class="row g-4">
-                <!-- Biểu đồ trạng thái -->
                 <div class="col-md-6">
                     <div class="card shadow-sm">
                         <div class="card-header">
@@ -65,7 +65,6 @@
                         </div>
                         <div class="card-body">
                             <canvas id="statusChart" height="250"></canvas>
-                            <!-- Truyền data qua hidden spans -->
                             <div id="statusData" style="display:none">
                                 <span th:each="entry : ${borrowsByStatus}"
                                       th:data-label="${entry.key}"
@@ -74,8 +73,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Biểu đồ top sách -->
                 <div class="col-md-6">
                     <div class="card shadow-sm">
                         <div class="card-header">
@@ -92,8 +89,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Bảng chi tiết trạng thái -->
             <div class="row g-4 mt-2">
                 <div class="col-12">
                     <div class="card shadow-sm">
@@ -133,13 +128,10 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
-
 <script>
-    // Đọc data từ hidden spans
     function readChartData(containerId) {
         const spans = document.querySelectorAll('#' + containerId + ' span');
         const labels = [], values = [];
@@ -149,8 +141,6 @@
         });
         return { labels, values };
     }
-
-    // Biểu đồ trạng thái
     const statusData = readChartData('statusData');
     if (statusData.labels.length > 0) {
         new Chart(document.getElementById('statusChart'), {
@@ -164,37 +154,23 @@
                     };
                     return map[l] || l;
                 }),
-                datasets: [{
-                    data: statusData.values,
-                    backgroundColor: ['#f59e0b','#06b6d4','#3b82f6','#10b981','#ef4444','#6b7280']
-                }]
+                datasets: [{ data: statusData.values, backgroundColor: ['#f59e0b','#06b6d4','#3b82f6','#10b981','#ef4444','#6b7280'] }]
             },
             options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
         });
     }
-
-    // Biểu đồ top sách
     const topData = readChartData('topBooksData');
     if (topData.labels.length > 0) {
         new Chart(document.getElementById('topBooksChart'), {
             type: 'bar',
             data: {
                 labels: topData.labels.map(k => k.length > 20 ? k.substring(0,20)+'...' : k),
-                datasets: [{
-                    label: 'Số lần mượn',
-                    data: topData.values,
-                    backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6']
-                }]
+                datasets: [{ label: 'Số lần mượn', data: topData.values, backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6'] }]
             },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
-            }
+            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
         });
     }
 </script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script th:src="@{/js/main.js}"></script>
 </body>
