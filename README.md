@@ -72,20 +72,3 @@ bash.\mvnw spring-boot:run
 
 - Mật khẩu: admin123
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Tài khoảnMật khẩuVai tròadminadmin123Admin
-
