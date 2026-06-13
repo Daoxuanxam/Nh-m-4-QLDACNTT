@@ -61,15 +61,16 @@ sqlCREATE DATABASE quanlythuvien;
 propertiesspring.datasource.username=root
 
 spring.datasource.password=your_password
+
 5. Chạy ứng dụng:
 bash.\mvnw spring-boot:run
 6. Truy cập: http://localhost:8080
 
 🔑 Tài khoản mặc định: Vai trò admin
 
-Tài khoản: admin
+ - Tài khoản: admin
 
-Mật khẩu: admin123
+- Mật khẩu: admin123
 
 
 
