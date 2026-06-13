@@ -14,33 +14,33 @@ Họ tên và Vai trò:
   
 ⚙️ Công nghệ sử dụng
 
-Backend: Java 17, Spring Boot 3.2.0, Spring Security, Spring Data JPA
-Frontend: Thymeleaf, Bootstrap 5.3, Font Awesome 6.4, Chart.js
-Database: MySQL 8.x
-IDE: Spring Tools Suite 4 (STS)
-Quản lý phụ thuộc: Maven
+- Backend: Java 17, Spring Boot 3.2.0, Spring Security, Spring Data JPA
+- Frontend: Thymeleaf, Bootstrap 5.3, Font Awesome 6.4, Chart.js
+- Database: MySQL 8.x
+- IDE: Spring Tools Suite 4 (STS)
+- Quản lý phụ thuộc: Maven
 
 
 🚀 Chức năng chính
 Admin / Nhân viên:
 
-Đăng nhập, đăng xuất
-Quản lý sách (thêm, sửa, xóa, tìm kiếm)
-Quản lý phiếu mượn (duyệt, từ chối, xác nhận nhận tiền, trả sách)
-Quản lý độc giả
-Quản lý nhân viên (chỉ Admin)
-Thống kê biểu đồ (chỉ Admin)
+- Đăng nhập, đăng xuất
+- Quản lý sách (thêm, sửa, xóa, tìm kiếm)
+- Quản lý phiếu mượn (duyệt, từ chối, xác nhận nhận tiền, trả sách)
+- Quản lý độc giả
+- Quản lý nhân viên (chỉ Admin)
+- Thống kê biểu đồ (chỉ Admin)
 
 Độc giả:
 
-Đăng ký tài khoản, đăng nhập
-Xem danh sách sách, tìm kiếm, lọc theo thể loại
-Xem chi tiết sách
-Đăng ký mượn sách
-Xem phiếu xác nhận mượn
-Gia hạn sách (tối đa 2 lần)
-Đánh giá sách (sau khi trả)
-Xem lịch sử mượn trả
+- Đăng ký tài khoản, đăng nhập
+- Xem danh sách sách, tìm kiếm, lọc theo thể loại
+- Xem chi tiết sách
+- Đăng ký mượn sách
+- Xem phiếu xác nhận mượn
+- Gia hạn sách (tối đa 2 lần)
+- Đánh giá sách (sau khi trả)
+- Xem lịch sử mượn trả
 
 
 🗄️ Cài đặt và chạy
