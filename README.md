@@ -6,11 +6,11 @@ Hệ thống quản lý thư viện trực tuyến được xây dựng bằng S
 👥 Thành viên nhóm
 Họ tên và Vai trò:
 
-- Dương Lê Mỹ Tâm: Review SRS 
+- Dương Lê Mỹ Tâm: PM+BA
 - Đào Xuân Xâm: Frontend
 - Nguyễn Xuân Tú: Backend
 - Phan Vân Anh: Tester
-- Hà Thị Quyên: Viết tài liệu đặc tả
+- Hà Thị Quyên: BA
   
 ⚙️ Công nghệ sử dụng
 
