@@ -1,10 +1,17 @@
 📚 Hệ Thống Quản Lý Thư Viện - Nhóm 4
 Hệ thống quản lý thư viện trực tuyến được xây dựng bằng Spring Boot, hỗ trợ đầy đủ chức năng cho Admin, Nhân viên và Độc giả.
+
 🌐 Demo: https://quanlythuvien-production.up.railway.app
 
 👥 Thành viên nhóm
-Họ tênVai tròĐào Xuân XâmBackend + Frontend(Thêm tên các bạn vào)...
+Họ tên và Vai trò:
 
+- Dương Lê Mĩ Tâm: Review SRS 
+- Đào Xuân Xâm: Frontend
+- Nguyễn Xuân Tú: Backend
+- Phan Vân Anh: Tester
+- Hà Thị Quyên: Viết tài liệu đặc tả
+  
 ⚙️ Công nghệ sử dụng
 
 Backend: Java 17, Spring Boot 3.2.0, Spring Security, Spring Data JPA
@@ -59,18 +66,3 @@ bash.\mvnw spring-boot:run
 🔑 Tài khoản mặc định
 Tài khoảnMật khẩuVai tròadminadmin123Admin
 
-📁 Cấu trúc project
-src/
-├── main/
-│   ├── java/qltv/com/
-│   │   ├── config/        # Cấu hình Security
-│   │   ├── controller/    # Xử lý request
-│   │   ├── entity/        # Các entity
-│   │   ├── repository/    # Truy vấn database
-│   │   └── service/       # Xử lý logic
-│   └── resources/
-│       ├── templates/     # Giao diện Thymeleaf
-│       │   ├── admin/     # Trang admin
-│       │   ├── auth/      # Trang đăng nhập/đăng ký
-│       │   └── user/      # Trang người dùng
-│       └── static/        # CSS, JS
