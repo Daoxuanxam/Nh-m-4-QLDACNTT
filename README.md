@@ -1,7 +1,7 @@
 📚 Hệ Thống Quản Lý Thư Viện - Nhóm 4
 Hệ thống quản lý thư viện trực tuyến được xây dựng bằng Spring Boot, hỗ trợ đầy đủ chức năng cho Admin, Nhân viên và Độc giả.
 
-🌐 Demo: https://quanlythuvien-production.up.railway.app
+🌐 Demo: https://quanlythuvien-production-1d34.up.railway.app/books/list
 
 👥 Thành viên nhóm
 Họ tên và Vai trò:
@@ -63,6 +63,24 @@ spring.datasource.password=your_password
 bash.\mvnw spring-boot:run
 5. Truy cập: http://localhost:8080
 
-🔑 Tài khoản mặc định
+🔑 Tài khoản mặc định: Vai trò admin
+Tài khoản: admin
+Mật khẩu: admin123
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Tài khoảnMật khẩuVai tròadminadmin123Admin
 
