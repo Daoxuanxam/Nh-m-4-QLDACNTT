@@ -57,14 +57,18 @@ cd Nh-m-4-QLDACNTT
 2. Tạo database:
 sqlCREATE DATABASE quanlythuvien;
 3. Cấu hình database trong src/main/resources/application.properties:
+
 propertiesspring.datasource.username=root
+
 spring.datasource.password=your_password
-4. Chạy ứng dụng:
+5. Chạy ứng dụng:
 bash.\mvnw spring-boot:run
-5. Truy cập: http://localhost:8080
+6. Truy cập: http://localhost:8080
 
 🔑 Tài khoản mặc định: Vai trò admin
+
 Tài khoản: admin
+
 Mật khẩu: admin123
 
 
